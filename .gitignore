@@ -1,0 +1,17 @@
+# files with tokens
+**/*.token
+
+# dataset dir
+dataset/
+
+# test tweets dir
+**/test_tweets_*/
+
+# pycache dirs
+**/__pycache__/
+
+# tweets
+*.json
+
+# Intellij
+.idea
