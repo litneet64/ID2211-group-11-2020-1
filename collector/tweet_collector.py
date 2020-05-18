@@ -31,7 +31,10 @@ if __name__ == "__main__":
     # authenticate as user and also as app (makes searching for replies faster)
     t_user, t_app = tclient.auth_ua(c_path)
 
+    # traversed nodes dict
+    traversed = {}
+
     # call the main traverse through seeds method
-    tgraph.traverse_lvl0(t_user, t_app, t_query, s_nodes, level0_filename, p_file)
+    tgraph.traverse_lvl0(t_user, t_app, t_query, s_nodes, level0_filename, p_file, traversed)
 
     print("[+] Done!")
