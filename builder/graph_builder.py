@@ -85,9 +85,9 @@ def populateGraph(G, in_path, weighted):
                     add_entities(G, u_node, to_u_node, weighted)
 
             # check if tweet is a retweet
-            elif tweet.get(ret_id):
+            if tweet.get(ret_id):
                 to_u_node = (tweet[ret_id]['user']['id_str'], tweet[ret_id]['user']['screen_name'])
-                add_entities(G, tweet, to_u_node, weighted)
+                add_entities(G, u_node, to_u_node, weighted)
 
     return G
 
@@ -102,7 +102,7 @@ def make_undirected(G, weighted):
         # otherwise just set them to 1 after making the graph undirected
         for a, b in new_G.edges():
             new_G[a][b]['weight'] = 1
-            
+
         return new_G
 
 
