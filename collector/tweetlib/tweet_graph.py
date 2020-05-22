@@ -44,7 +44,7 @@ def process_node(**kwargs):
 
 
 # traverse through all level 0 (seeds) nodes
-def traverse_lvl0(t_user, t_app, t_query, s_nodes, filename, p_file, trav):
+def traverse_lvl0(t_user, t_app, t_query, s_nodes, filename, p_file, traversed):
     # seed tweet counter
     c = 0
 
@@ -57,14 +57,14 @@ def traverse_lvl0(t_user, t_app, t_query, s_nodes, filename, p_file, trav):
         if tcheck.is_new_seed(tweet, p_file, trav):
             process_node(auth = t_app, auth2 = t_user, tweet = tweet,
                         filename = filename, lvl = 0, c_count = c,
-                         t_count = s_nodes, trav = trav)
+                         t_count = s_nodes, trav = traversed)
             c += 1
     return
 
 
 
 # traverse through seed node getting lvl 1 components
-def traverse_to_lvl1(t_app, t_user, seed, trav, t_cnt):
+def traverse_to_lvl1(t_app, t_user, seed, traversed, t_cnt):
     seed_id = seed['id']
     level1_filename = DATADIR + "tweet_{}@{}.json".format(t_cnt, seed_id)
     c_cnt = ret_cnt = rep_cnt = 0
@@ -81,7 +81,7 @@ def traverse_to_lvl1(t_app, t_user, seed, trav, t_cnt):
                 process_node(auth = t_app, auth2 = t_user, tweet = rep,
                             c_count = c_cnt, seed = seed, t_count = t_cnt,
                              filename = level1_filename, lvl = 1,
-                             type = "reply", trav = trav)
+                             type = "reply", trav = traversed)
                 c_cnt += 1
                 rep_cnt += 1
         except Exception as e:
@@ -96,9 +96,10 @@ def traverse_to_lvl1(t_app, t_user, seed, trav, t_cnt):
                 break
             # ignore if it's not useful to us
             elif tcheck.pass_pruning_lvl_1(seed, ret, trav):
-                process_node(auth = t_app, tweet = ret, c_count = c_cnt,
-                            seed = seed, t_count = t_cnt, filename = level1_filename,
-                            lvl = 1, type = "retweet", trav = traversed)
+                process_node(auth = t_app, auth2 = t_user, tweet = ret,
+                            c_count = c_cnt, seed = seed, t_count = t_cnt,
+                            filename = level1_filename, lvl = 1,
+                             type = "retweet", trav = traversed)
                 c_cnt += 1
                 ret_cnt += 1
         except Exception as e:
