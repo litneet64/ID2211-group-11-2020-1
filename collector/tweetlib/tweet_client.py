@@ -23,7 +23,7 @@ def get_args():
     # maximum date to search for tweets
     parser.add_argument("-u", "--until", type = int, help = "Maximum number of days ago\
             from current day to search for tweets, like an 'until' to a certain date \
-            (Between 1 and 6. Default: 1)", choices = range(1,7), default = 1)
+            (Between 0 and 6. Default: 1)", choices = range(0,7), default = 1)
 
     # parent file to check for traversed seeds
     parser.add_argument("-p", "--parent-file", help = "File with seed tweets (parents) to\
