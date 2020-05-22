@@ -54,7 +54,7 @@ def traverse_lvl0(t_user, t_app, t_query, s_nodes, filename, p_file, traversed):
             break
 
         # if arg exists and is a new seed not previously processed
-        if tcheck.is_new_seed(tweet, p_file, trav):
+        if tcheck.is_new_seed(tweet, p_file, traversed):
             process_node(auth = t_app, auth2 = t_user, tweet = tweet,
                         filename = filename, lvl = 0, c_count = c,
                          t_count = s_nodes, trav = traversed)
@@ -77,7 +77,7 @@ def traverse_to_lvl1(t_app, t_user, seed, traversed, t_cnt):
             if rep_cnt == REP_CAP:
                 break
             # traverse and save only if they are useful to us
-            elif tcheck.pass_pruning_lvl_1(seed, rep, trav):
+            elif tcheck.pass_pruning_lvl_1(seed, rep, traversed):
                 process_node(auth = t_app, auth2 = t_user, tweet = rep,
                             c_count = c_cnt, seed = seed, t_count = t_cnt,
                              filename = level1_filename, lvl = 1,
@@ -95,7 +95,7 @@ def traverse_to_lvl1(t_app, t_user, seed, traversed, t_cnt):
             if ret_cnt == RET_CAP:
                 break
             # ignore if it's not useful to us
-            elif tcheck.pass_pruning_lvl_1(seed, ret, trav):
+            elif tcheck.pass_pruning_lvl_1(seed, ret, traversed):
                 process_node(auth = t_app, auth2 = t_user, tweet = ret,
                             c_count = c_cnt, seed = seed, t_count = t_cnt,
                             filename = level1_filename, lvl = 1,
