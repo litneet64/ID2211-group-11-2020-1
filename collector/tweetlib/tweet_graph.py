@@ -96,9 +96,10 @@ def traverse_to_lvl1(t_app, t_user, seed, traversed, t_cnt):
                 break
             # ignore if it's not useful to us
             elif tcheck.pass_pruning_lvl_1(seed, ret, trav):
-                process_node(auth = t_app, tweet = ret, c_count = c_cnt,
-                            seed = seed, t_count = t_cnt, filename = level1_filename,
-                            lvl = 1, type = "retweet", trav = traversed)
+                process_node(auth = t_app, auth2 = t_user, tweet = ret,
+                            c_count = c_cnt, seed = seed, t_count = t_cnt,
+                            filename = level1_filename, lvl = 1,
+                             type = "retweet", trav = traversed)
                 c_cnt += 1
                 ret_cnt += 1
         except Exception as e:
