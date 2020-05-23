@@ -53,5 +53,3 @@ print("Results successfully written to commoperoutput.txt!")
 # File handling
 inputfile.close()
 outputfile.close()
-    
- 
