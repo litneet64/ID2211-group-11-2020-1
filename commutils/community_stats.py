@@ -55,8 +55,15 @@ def get_all_tweets(tweet_path, users):
             if curr_u in users:
                 # if tweet dict doesn't contain user entry
                 if not users_tweets.get(curr_u):
-                    users_tweets[curr_u] = [tweet]
+                    users_tweets[curr_u] = []
                 users_tweets[curr_u] += [tweet]
+
+    # add all users that did not appear with empty lists
+    for u in users:
+        # and also print them out so user can notice
+        if u not in users_tweets:
+            users_tweets[u] = []
+            print(f"[!] Couldn't find user '{u}' as author in any tweet...")
 
     return users_tweets
 
@@ -68,6 +75,7 @@ def set_nltk_packages():
         nltk.download('stopwords')
     except Exception as e:
         print(f"[!] Exception while downloading packages: {e}")
+        exit(127)
 
     return
 
@@ -84,10 +92,8 @@ def n_most_common_items(item_dict, limit = 10):
     n_most_common = sorted_items[:limit]
 
     for w, f in n_most_common:
-        if w == "":
-            most_common["NULL"] = f
-        else:
-            most_common[w] = f
+        w = "NULL" if w == "" else w
+        most_common[w] = f
 
     return most_common
 
@@ -154,7 +160,8 @@ def filter_words(text, lan_code):
 def get_hashtags(h_list):
     hashtags = {}
     for h in h_list:
-        hashtags["#" + h['text']] = 1
+        h_tag = "#" + h['text']
+        hashtags[h_tag] = 1
 
     return hashtags
 
@@ -188,7 +195,7 @@ def get_multi_metric(metr_values, metr_name, u, u_metrics):
         for item, f in metr_values.items():
             # if it exists check if given item also exist, if it does, add frequency to prev one
             if not u_metrics[u][metr_name].get(item):
-                u_metrics[u][metr_name][item] = f
+                u_metrics[u][metr_name][item] = 0
             u_metrics[u][metr_name][item] += f
 
     return
@@ -197,10 +204,10 @@ def get_multi_metric(metr_values, metr_name, u, u_metrics):
 # get the most common words used in given tweet
 def get_most_common_words(full_text, lang_code, u, u_metrics):
     # reduce noise from the text, get frequency of remaining words
-    # and get the 100 most common ones used
+    # and get the 200 most common ones used
     filt_words = filter_words(full_text, lang_code)
     word_freqs = get_freq(filt_words)
-    common_words  = n_most_common_items(word_freqs, 100)
+    common_words  = n_most_common_items(word_freqs, 200)
 
     # get multi metrics from all words
     get_multi_metric(common_words, 'common words', u, u_metrics)
@@ -214,7 +221,7 @@ def common_metrics(users, users_tweets):
     for u in users:
         for tweet in users_tweets[u]:
             # get languages used from tweets made by this user
-            get_single_metric(tweet['lang'], 'language', u, users)
+            get_single_metric(get_lang_name(tweet['lang']), 'language', u, users)
 
             # get all locations for this user (sometimes can be blank)
             get_single_metric(tweet['user']['location'], 'location', u, users)
@@ -269,8 +276,16 @@ def show_community_stats(comm_stats):
         ax = plt.subplot(1,1,1, xlabel = metr, ylabel = "frequency",
                         title = f"20 most common for: \'{metr}\'")
 
+        # standard width for regular metrics
+        c_width = 0.65
+
+        # get bigger gap between bins if we are dealing with troublesome metrics
+        if metr in ['common words', 'hashtag']:
+            c_width = 0.3
+
         # bar plot
-        ax.bar(x, y, width = 0.9, color = "darkblue", alpha = 0.8)
+        ax.bar(x, y, width = c_width, color = "darkblue", alpha = 0.8)
+
         plt.show()
 
     return
