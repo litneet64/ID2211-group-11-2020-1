@@ -328,8 +328,8 @@ def show_community_stats(comm_stats, saved):
 def save_stats(comm_stats):
     out_path = "community_report.txt"
     # general strings used for every field
-    ban_1 = "=" * 40
-    ban_2 = "\n\t\t"
+    ban_1 = "=" * 80
+    ban_2 = "\n\t\t\t\t"
     ban_3 = "\n\n"
 
     with open(out_path, 'w+') as stat_f:
