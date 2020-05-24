@@ -150,30 +150,46 @@ def filter_words(text, lan_code):
     return cleaned_words
 
 
-# get the languages used by these users
-def get_lang(lang, u, u_metrics):
-    # check if 'user lang' dict is already on dict
-    if not u_metrics[u].get('lang'):
-        u_metrics[u]['lang'] = {}
+# get all hashtags from list
+def get_hashtags(h_list):
+    hashtags = {}
+    for h in h_list:
+        hashtags["#" + h['text']] = 1
 
-    # check if user has already counted this lang before
-    if not u_metrics[u]['lang'].get(lang):
-        u_metrics[u]['lang'][lang] = 0
-    u_metrics[u]['lang'][lang] += 1
+    return hashtags
+
+
+# get specified singular metric from tweet (only one per tweet)
+# (location freq, language freq, and so on)
+def get_single_metric(metr_val, metr_name, u, u_metrics):
+    # check if metric dict already exists
+    if not u_metrics[u].get(metr_name):
+        u_metrics[u][metr_name] = {}
+
+    # check if user already has this field inside certain metric
+    if not u_metrics[u][metr_name].get(metr_val):
+        u_metrics[u][metr_name][metr_val] = 0
+    u_metrics[u][metr_name][metr_val] += 1
 
     return
 
 
-# get the location for this user based on a single tweet
-def get_loc(loc, u, u_metrics):
-    # check if locations dict already exists
-    if not u_metrics[u].get('location'):
-        u_metrics[u]['location'] = {}
+# get specified multiple metric from tweet (many per tweet)
+# (common words, hashtags used)
+def get_multi_metric(metr_values, metr_name, u, u_metrics):
+    # check special case
+    if metr_name == "hashtag":
+        metr_values = get_hashtags(metr_values)
 
-    # check if user already has this location inside
-    if not u_metrics[u]['location'].get(loc):
-        u_metrics[u]['location'][loc] = 0
-    u_metrics[u]['location'][loc] += 1
+    # check if metric dict already exists
+    if not u_metrics[u].get(metr_name):
+        u_metrics[u][metr_name] = metr_values
+    else:
+        for item, f in metr_values.items():
+            # if it exists check if given item also exist, if it does, add frequency to prev one
+            if not u_metrics[u][metr_name].get(item):
+                u_metrics[u][metr_name][item] = f
+            u_metrics[u][metr_name][item] += f
 
     return
 
@@ -186,15 +202,8 @@ def get_most_common_words(full_text, lang_code, u, u_metrics):
     word_freqs = get_freq(filt_words)
     common_words  = n_most_common_items(word_freqs, 100)
 
-    # check if most used words already exists
-    if not u_metrics[u].get('common words'):
-        u_metrics[u]['common words'] = common_words
-    else:
-        for w, f in common_words.items():
-            # if it exists check if given words also exist, if they do, add frequency to them
-            if not u_metrics[u]['common words'].get(w):
-                u_metrics[u]['common words'][w] = f
-            u_metrics[u]['common words'][w] += f
+    # get multi metrics from all words
+    get_multi_metric(common_words, 'common words', u, u_metrics)
 
     return
 
@@ -205,13 +214,17 @@ def common_metrics(users, users_tweets):
     for u in users:
         for tweet in users_tweets[u]:
             # get languages used from tweets made by this user
-            get_lang(tweet['lang'], u, users)
+            get_single_metric(tweet['lang'], 'language', u, users)
+
+            # get all locations for this user (sometimes can be blank)
+            get_single_metric(tweet['user']['location'], 'location', u, users)
+
+            # get all hashtags made by this user (sometimes can be blank)
+            get_multi_metric(tweet['entities']['hashtags'], 'hashtag', u, users)
 
             # get most common words used by this user
             get_most_common_words(tweet['full_text'], tweet['lang'], u, users)
 
-            # get all locations for this user (sometimes can be blank)
-            get_loc(tweet['user']['location'], u, users)
 
     return users
 
