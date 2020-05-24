@@ -26,7 +26,8 @@ if __name__ == "__main__":
     t_path = args.file
 
     # user and tweet id set
-    users = set()
+    active_users = set()
+    mentioned_users = set()
     tweet_ids = set()
 
     # tweet counter
@@ -37,13 +38,24 @@ if __name__ == "__main__":
         for raw_tweet in tweet_file:
             tweet = json.loads(raw_tweet)
 
+            # get active users (the ones that made the tweets) and tweets
             tweet_ids.add(tweet['id'])
-            users.add(tweet['user']['id'])
+            active_users.add(tweet['user']['id'])
+
+            # get all mentioned users
+            for mentioned_user in tweet['entities']['user_mentions']:
+                mentioned_users.add(mentioned_user['id'])
+
             c += 1
 
-    # unique tweets
+    # unique tweets, all mentioned users, all tweet authors and all users involved
     ut = len(tweet_ids)
+    all_ment = len(mentioned_users)
+    act_u = len(active_users)
+    all_users = len(set.union(active_users, mentioned_users))
 
     # print results
-    print(f"[+] Found {len(users)} unique users in {c} tweets...")
+    print(f"[+] Found {all_users} unique users ({act_u} active and {all_users - act_u} passive)...")
+    print(f"[+] Found {act_u} unique tweet authors in {c} tweets...")
+    print(f"[+] Found {all_ment} unique mentions in {c} tweets...")
     print(f"[+] Found {ut} unique tweets on {c} tweets ({c-ut} dups)...")
