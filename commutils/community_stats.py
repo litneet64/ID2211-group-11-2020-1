@@ -10,8 +10,8 @@ from time import ctime
 from string import punctuation
 from pycountry import languages
 from nltk.corpus import stopwords
+from adjustText import adjust_text
 from nltk.probability import FreqDist
-
 
 # standard argument parser
 def get_args():
@@ -282,8 +282,9 @@ def show_community_stats(comm_stats, saved):
 
     # go through every metric
     for metr in comm_stats:
-        x = comm_stats[metr].keys()
-        y = comm_stats[metr].values()
+        x_labels = list(comm_stats[metr].keys())
+        x = list(range(1, len(x_labels) + 1))
+        y = list(comm_stats[metr].values())
 
         ax = plt.subplot(1,1,1, xlabel = metr, ylabel = "frequency",
                         title = f"20 most common for: \'{metr}\'")
@@ -291,13 +292,28 @@ def show_community_stats(comm_stats, saved):
         # standard width for regular metrics
         c_width = 0.65
 
-        # get bigger gap between bins if we are dealing with troublesome metrics
+        # get bigger gap between bins (less width for bins) if we are
+        #    dealing with troublesome metrics
         if metr in ['words', 'hashtag']:
             c_width = 0.3
 
         # bar plot
-        ax.bar(x, y, width = c_width, color = "darkblue", alpha = 0.8)
+        bars = ax.bar(x, y, tick_label = x, width = c_width, color = "darkblue", alpha = 0.8)
+        texts = []
 
+        # get coords for bars and append text
+        # based on: https://github.com/Phlya/adjustText/blob/master/docs/source/Examples.ipynb
+        for j,rect in enumerate(bars):
+            left = rect.get_x() + 0.14
+            top = rect.get_y() + rect.get_height() - 0.2
+            texts.append(ax.text(left, top, f"{x_labels[j]}"))
+
+        # move text as to remove overlapping labels (can take some time)
+        adjust_text(texts, add_objects = bars, arrowprops=dict(arrowstyle='->', color="red"),
+                    autoalign = 'x', only_move = {'points': 'y', 'text': 'y',
+                    'objects': 'y'}, ha = "center", va = "bottom")
+
+        # check if we want to show it or save it to file
         if saved:
             out_path = f"20_most_common-{metr}.png"
             plt.savefig(out_path)
