@@ -98,9 +98,9 @@ def n_most_common_items(item_dict, limit = 10):
     return most_common
 
 
-# get language name
-def get_lang_name(iso_639_1_code):
-    lan = languages.lookup(iso_639_1_code).name.lower()
+# get language name from ISO 639 2 or 1 code
+def get_lang_name(iso_639_code):
+    lan = languages.lookup(iso_639_code).name.lower()
 
     return lan
 
@@ -220,8 +220,15 @@ def common_metrics(users, users_tweets):
     # go through every user's tweet and grab the languages used
     for u in users:
         for tweet in users_tweets[u]:
+            # attempt to recover the full name for this language
+            try:
+                lang = get_lang_name(tweet['lang'])
+            except Exception as e:
+                lang = tweet['lang']
+                print(f"[!] ISO-639 language code \'{lang}\' not found (user \'{u}\')...")
+
             # get languages used from tweets made by this user
-            get_single_metric(get_lang_name(tweet['lang']), 'language', u, users)
+            get_single_metric(lang, 'language', u, users)
 
             # get all locations for this user (sometimes can be blank)
             get_single_metric(tweet['user']['location'], 'location', u, users)
