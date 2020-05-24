@@ -6,6 +6,7 @@ import nltk
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+from time import ctime
 from string import punctuation
 from pycountry import languages
 from nltk.corpus import stopwords
@@ -26,6 +27,10 @@ def get_args():
     # path to file with the community
     parser.add_argument("-c", "--comm-file", help = "Path to the file with a given community",
             required = True)
+
+    # save stats into file instead of showing them on the run
+    parser.add_argument("-s", "--save-stats", action = "store_true", help = "Save stats and plots into disc "\
+                        "instead of showing them after each run")
 
     return parser.parse_args()
 
@@ -210,7 +215,7 @@ def get_most_common_words(full_text, lang_code, u, u_metrics):
     common_words  = n_most_common_items(word_freqs, 200)
 
     # get multi metrics from all words
-    get_multi_metric(common_words, 'common words', u, u_metrics)
+    get_multi_metric(common_words, 'words', u, u_metrics)
 
     return
 
@@ -268,7 +273,7 @@ def aggregated_metrics(users):
 
 
 # plotting function
-def show_community_stats(comm_stats):
+def show_community_stats(comm_stats, saved):
     # setup size of figure (width, height)
     fig_size = plt.rcParams["figure.figsize"]
     fig_size[0] = 15
@@ -276,7 +281,7 @@ def show_community_stats(comm_stats):
     plt.rcParams["figure.figsize"] = fig_size
 
     # go through every metric
-    for metr in comm_stats.keys():
+    for metr in comm_stats:
         x = comm_stats[metr].keys()
         y = comm_stats[metr].values()
 
@@ -287,16 +292,57 @@ def show_community_stats(comm_stats):
         c_width = 0.65
 
         # get bigger gap between bins if we are dealing with troublesome metrics
-        if metr in ['common words', 'hashtag']:
+        if metr in ['words', 'hashtag']:
             c_width = 0.3
 
         # bar plot
         ax.bar(x, y, width = c_width, color = "darkblue", alpha = 0.8)
 
-        plt.show()
+        if saved:
+            out_path = f"20_most_common-{metr}.png"
+            plt.savefig(out_path)
+            print(f"[+] Saved histogram for \'{metr}\' at \'{out_path}\'")
+        else:
+            plt.show()
 
     return
 
+
+# save stats into file
+def save_stats(comm_stats):
+    out_path = "community_report.txt"
+    # general strings used for every field
+    ban_1 = "=" * 40
+    ban_2 = "\n\t\t"
+    ban_3 = "\n\n"
+
+    with open(out_path, 'w+') as stat_f:
+        # write title and current time it was created
+        stat_f.write(f"{ban_1}{ban_2}Community Stats{ban_2[::-1]}{ban_1}\n")
+        stat_f.write(f"Made on {ctime()}{ban_3}")
+
+        # go through every metric gathering stats into a long string
+        for metr in comm_stats:
+            # banner for the metric name (acts as separator)
+            banner = f"{ban_1}{ban_2}{metr.upper()}{ban_2[::-1]}{ban_1}{ban_3}"
+            content = banner
+
+            # get total freqs
+            total_f = sum(comm_stats[metr].values())
+
+            for item, freq in comm_stats[metr].items():
+                # add it like a normalized histogram with frequency
+                norm_f = round(freq * 100 / total_f)
+                item_title = f"{item} ({freq}):".ljust(40)
+                content += f"{item_title}{'#' * norm_f}\n"
+
+            # and then write the string to file
+            content += "\n\n"
+            stat_f.write(content)
+
+    print(f"[+] Written stats at \'{out_path}\'!")
+
+    return
 
 
 # main piece of code
@@ -307,6 +353,7 @@ if __name__ == "__main__":
     # and throw them into vars
     tweet_f = args.tweet_file
     comm_f = args.comm_file
+    saved = args.save_stats
 
     # set nltk if packages haven't been downloaded
     set_nltk_packages()
@@ -321,5 +368,9 @@ if __name__ == "__main__":
     # aggregate these metrics
     comm_stats = aggregated_metrics(users)
 
-    # plot the aggregated stats
-    show_community_stats(comm_stats)
+    # plot or save the aggregated stats
+    show_community_stats(comm_stats, saved)
+
+    if saved:
+        # save the aggregated stats
+        save_stats(comm_stats)
