@@ -99,11 +99,14 @@ def make_undirected(G, weighted):
     # first check if we care about the weights
     if not weighted:
         new_G = nx.Graph(G)
-        # otherwise just set them to 1 after making the graph undirected
+        # otherwise just set them to 1 after making the
+        # graph undirected (edge in both ways)
         for a, b in new_G.edges():
-            new_G[a][b]['weight'] = 1
+            new_G.add_edge(a, b, weight = 1)
+            new_G.add_edge(b, a, weight = 1)
 
-        return new_G
+        # returns graph with edges in both ways
+        return new_G.to_directed()
 
 
     # get the sum of weights into new edges
@@ -119,21 +122,16 @@ def make_undirected(G, weighted):
         elif new_edges.get(e2):
             new_edges[e2] += w
 
-    # add nodes to new graph
-    new_G = nx.Graph()
-    new_G.add_nodes_from(G)
+    # create new graph based on the previous one
+    new_G = nx.Graph(G)
 
-    # add node attributes
-    for node, all_attr in G.nodes.data():
-        for attr in all_attr:
-            new_G.nodes[node][attr] = G.nodes[node][attr]
-
-    # add updated edges to graph
+    # add updated edges to graph (edge in both ways)
     for e in new_edges:
         a, b = e.split("-")
         new_G.add_edge(a, b, weight = new_edges[e])
+        new_G.add_edge(b, a, weight = new_edges[e])
 
-    return new_G
+    return new_G.to_directed()
 
 
 # save file according to file format ending
