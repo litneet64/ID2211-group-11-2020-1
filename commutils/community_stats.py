@@ -29,7 +29,7 @@ def get_args():
             required = True)
 
     # save stats into file instead of showing them on the run
-    parser.add_argument("-s", "--save-stats", action = "store_true", help = "Save stats and plots into disc "\
+    parser.add_argument("-s", "--save-stats", action = "store_true", help = "Save stats and plots into disk "\
                         "instead of showing them after each run")
 
     return parser.parse_args()
