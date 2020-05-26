@@ -8,9 +8,11 @@ import json
 def get_users(comm_path):
     users = {}
     with open(comm_path, 'r') as comm_f:
-        user_list = comm_f.readline().strip('\n').split('\t')
-        for u in user_list:
-            users[u] = {}
+        for u_line in comm_f.readlines():
+            user_list = u_line.strip('\n').split('\t')
+            
+            for u in user_list:
+                users[u] = {}
 
     return users
 
