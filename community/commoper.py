@@ -7,8 +7,8 @@ def FormatWrite(s, file):
     file.write(str(node) + " ")
 
 # File handling
-inputfile = open("cmtyvv.txt", "r")
-outputfile = open("commoperoutput.txt", "w")
+inputfile = open("../../outputs/cmtyvv.txt", "r")
+outputfile = open("../../outputs/commoperoutputX.txt", "w")
 
 # Fetch communities from input file
 commlist = [set(line.split()) for line in inputfile]
