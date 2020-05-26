@@ -140,8 +140,8 @@ def write_footer(html_file):
 # traverse through tweet file parsing tweet contents
 def write_from_file(in_path, out_path, av_dir):
     # read all tweets from input file and write them to out file
-    with open(in_path) as tweet_f:
-        with open(out_path, "+w") as html_f:
+    with open(in_path, encoding="utf-8") as tweet_f:
+        with open(out_path, "+w", encoding="utf-8") as html_f:
             # write header for html file
             write_header(html_f)
 
@@ -159,7 +159,7 @@ def write_from_file(in_path, out_path, av_dir):
 
 # write tweets to html from a user-tweet data struct
 def write_from_tweets(users_tweets, out_p, av_dir):
-    with open(out_p, "w") as html_f:
+    with open(out_p, "w", encoding="utf-8") as html_f:
         # write header for html file
         write_header(html_f)
 
