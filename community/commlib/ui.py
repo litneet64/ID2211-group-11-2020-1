@@ -92,7 +92,7 @@ def save_stats(comm_stats):
     ban_2 = "\n\t\t\t\t"
     ban_3 = "\n\n"
 
-    with open(out_path, 'w+') as stat_f:
+    with open(out_path, 'w+', encoding="utf-8") as stat_f:
         # write title and current time it was created
         stat_f.write(f"{ban_1}{ban_2}Community Stats{ban_2[::-1]}{ban_1}\n")
         stat_f.write(f"Made on {ctime()}{ban_3}")

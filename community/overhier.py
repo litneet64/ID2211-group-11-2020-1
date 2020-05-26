@@ -1,18 +1,18 @@
 # overhier.py
 
-# Define constants
-N = 133
-NNODES = 26163
-OVERTRESHOLD = .2
-HIERTRESHOLD = .8
+# Define constants (default = the graph we used)
+N = 157
+NNODES = 40336
+OVERTRESHOLD = 0.2
+HIERTRESHOLD = 0.8
 
 # Calculate Jaccard coefficient
 def JaccardCoef(set1, set2):
   return len(set1.intersection(set2))/len(set1.union(set2))
 
 # File handling
-inputfile = open("cmtyvv.txt", "r")
-outputfile = open("overhieroutput.txt", "w")
+inputfile = open("../../outputs/cmtyvv.txt", "r")
+outputfile = open("../../outputs/overhieroutputX.txt", "w")
 
 # Find overlapping and hierarchical communities
 overlist = list()
